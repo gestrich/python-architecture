@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "service-layer-skills",
-      "source": "https://github.com/gestrich/service-layer-skills",
+      "source": ".",
       "description": "General-purpose skills for Python applications following Martin Fowler's Service Layer pattern. Includes guides for creating services, writing tests, and determining correct architectural layers."
     }
   ]
