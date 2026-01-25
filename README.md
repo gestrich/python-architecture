@@ -1,6 +1,6 @@
-# Service Layer Skills Plugin
+# Python Architecture Plugin
 
-A Claude Code plugin providing general-purpose skills for developing Python applications following Martin Fowler's Service Layer pattern. This plugin helps Claude understand and apply architectural best practices for service-oriented codebases.
+A Claude Code plugin providing architectural best practices for Python applications. This plugin helps Claude understand and apply clean architecture patterns, including the Service Layer pattern, proper testing practices, and correct layer placement.
 
 ## Overview
 
@@ -18,12 +18,12 @@ These skills work together to ensure your codebase maintains clean architecture,
 
 1. Add the marketplace to Claude Code:
    ```
-   /plugin marketplace add gestrich/service-layer-skills
+   /plugin marketplace add gestrich/python-architecture
    ```
 
 2. Install the plugin:
    ```
-   /plugin install service-layer-skills@gestrich-service-layer-skills
+   /plugin install python-architecture@gestrich-python-architecture
    ```
 
 3. Restart Claude Code if necessary
@@ -32,7 +32,7 @@ These skills work together to ensure your codebase maintains clean architecture,
 
 For local development or testing:
 ```bash
-claude --plugin-dir ~/path/to/service-layer-skills
+claude --plugin-dir ~/path/to/python-architecture
 ```
 
 ## Skills Included
@@ -120,7 +120,7 @@ To learn more about the Service Layer pattern that these skills are based on:
 
 ## Contributing
 
-Found an issue or have a suggestion? Please open an issue on the [GitHub repository](https://github.com/gestrich/service-layer-skills).
+Found an issue or have a suggestion? Please open an issue on the [GitHub repository](https://github.com/gestrich/python-architecture).
 
 Contributions are welcome! Feel free to submit pull requests for:
 - Improvements to skill content
