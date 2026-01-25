@@ -1,10 +1,14 @@
 {
   "version": "1.0.0",
   "name": "gestrich-service-layer-skills",
+  "owner": {
+    "name": "Bill Gestrich",
+    "url": "https://github.com/gestrich"
+  },
   "plugins": [
     {
       "name": "service-layer-skills",
-      "source": ".",
+      "source": "https://github.com/gestrich/service-layer-skills",
       "description": "General-purpose skills for Python applications following Martin Fowler's Service Layer pattern. Includes guides for creating services, writing tests, and determining correct architectural layers."
     }
   ]
