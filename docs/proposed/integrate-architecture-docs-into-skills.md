@@ -194,7 +194,22 @@ argument-hint: "[topic]"
 
 **Expected outcome:** Consistent code organization across Python projects with proper datetime handling, clean imports, and modern type annotations.
 
-- [ ] Phase 5: Enhance testing-services skill
+- [x] Phase 5: Enhance testing-services skill ✓ **COMPLETED**
+
+**Technical notes:**
+- Enhanced `plugin/skills/testing-services/SKILL.md` with comprehensive testing guidance from testing-philosophy.md
+- All existing content preserved and enhanced with new sections
+- Added Test Isolation and Independence section after Quick Reference with self-contained test examples
+- Enhanced One Concept Per Test section with E2E exception explaining pragmatic trade-offs for slow tests
+- Added comprehensive Layer-Based Testing Strategy section with architecture diagram showing CLI → Service → Infrastructure → Domain layers
+- Included testing approach and coverage targets for each layer (Domain 99%, Infrastructure 97%, Service 95%, CLI 98%)
+- Added Coverage Guidelines section with priority-based testing strategy and coverage report commands
+- Added Quick Start section near beginning with local test execution examples and coverage viewing
+- Enhanced Test Organization section with complete directory structure mirroring src/, comprehensive naming conventions
+- Added CI/CD Integration section with GitHub Actions workflow example and PR requirements
+- Added cross-references to python-code-style skill (test organization), domain-modeling skill (what not to mock)
+- Added Related Skills section referencing creating-services, domain-modeling, python-code-style, identifying-layer-placement
+- File structure verified: testing-services skill now contains comprehensive testing philosophy integrated with existing patterns
 
 Update `plugin/skills/testing-services/SKILL.md` by adding content from testing-philosophy.md while preserving existing content:
 

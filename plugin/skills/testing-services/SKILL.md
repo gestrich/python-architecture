@@ -15,6 +15,42 @@ Activate this skill when:
 - Unclear what to mock vs what to test directly
 - Writing integration tests that test service interactions
 
+## Quick Start
+
+### Running Tests Locally
+
+```bash
+# Run all unit tests
+pytest tests/unit/ -v
+
+# Run all integration tests
+pytest tests/integration/ -v
+
+# Run both unit and integration tests
+pytest tests/unit/ tests/integration/ -v
+
+# Run with coverage report
+pytest tests/unit/ tests/integration/ --cov=src --cov-report=term-missing --cov-report=html
+
+# Run tests for a specific module
+pytest tests/unit/services/test_entity_service.py -v
+
+# Run a specific test
+pytest tests/unit/services/test_entity_service.py::TestEntityService::test_create_entity_success -v
+```
+
+### Understanding Test Results
+
+```bash
+# View coverage in terminal
+pytest tests/ --cov=src --cov-report=term-missing
+
+# View detailed HTML coverage report (opens in browser)
+pytest tests/ --cov=src --cov-report=html
+open htmlcov/index.html  # macOS
+xdg-open htmlcov/index.html  # Linux
+```
+
 ## Quick Reference
 
 ### AAA Pattern
@@ -49,6 +85,42 @@ pytest tests/ -k "test_create" -v             # Pattern matching
 - Focus on testing behavior, not hitting targets
 - Missing coverage acceptable for edge cases or trivial code
 
+## Test Isolation and Independence
+
+**Every test should be completely independent.** Tests must not:
+- Rely on execution order
+- Share mutable state
+- Depend on previous test results
+- Affect other tests when run in parallel
+
+### Example
+
+```python
+# ✅ GOOD - Each test is self-contained
+class TestTaskManagement:
+    def test_find_first_task(self, tmp_path):
+        """Should find the first unchecked task"""
+        # Arrange - Create fresh test data for this test only
+        spec_file = tmp_path / "spec.md"
+        spec_file.write_text("""
+        - [ ] Task 1
+        - [ ] Task 2
+        """)
+
+        # Act
+        result = find_next_available_task(str(spec_file))
+
+        # Assert
+        assert result == (1, "Task 1")
+
+# ❌ BAD - Tests depend on shared state
+shared_state = {"count": 0}
+
+def test_increment():
+    shared_state["count"] += 1
+    assert shared_state["count"] == 1  # Breaks if tests run out of order
+```
+
 ## Mock at Boundaries Rule
 
 **The Golden Rule**: Mock external systems only, never internal logic.
@@ -66,7 +138,7 @@ pytest tests/ -k "test_create" -v             # Pattern matching
 ### What NOT to Mock ❌
 
 **Internal logic**:
-- Domain models and dataclasses
+- Domain models and dataclasses (see **domain-modeling** skill for understanding what domain models are)
 - Pure functions, helper methods, static methods
 - Business logic calculations
 - Exceptions and error classes
@@ -208,6 +280,84 @@ class TestWorkflowService:
         assert result == 1
 ```
 
+## Layer-Based Testing Strategy
+
+Python applications often follow a **layered architecture**, and we test each layer differently:
+
+```
+┌─────────────────────────────────────────┐
+│          CLI Layer                      │  ← Test command orchestration
+│  (commands: prepare, finalize, etc.)    │     Mock everything below
+├─────────────────────────────────────────┤
+│       Service Layer                     │  ← Test business logic
+│  (services: task mgmt, reviewer mgmt)   │     Mock infrastructure
+├─────────────────────────────────────────┤
+│     Infrastructure Layer                │  ← Test external integrations
+│  (git, github, filesystem)              │     Mock external systems
+├─────────────────────────────────────────┤
+│         Domain Layer                    │  ← Test directly
+│  (models, config, exceptions)           │     Minimal/no mocking
+└─────────────────────────────────────────┘
+```
+
+**Key insight:** The **lower** the layer, the **less** you mock. Domain models are pure logic and need minimal mocking. CLI commands orchestrate everything and need maximum mocking.
+
+### Domain Layer (99% coverage target)
+
+**Testing approach:**
+- ✅ **Direct testing** - Minimal mocking
+- ✅ **Test business rules** - Validation logic, data transformations
+- ✅ **Test edge cases** - Invalid inputs, boundary conditions
+
+**What to mock:** Almost nothing. Domain models are pure logic.
+
+**Example:**
+```python
+class TestMarkdownFormatter:
+    """Test suite for MarkdownFormatter functionality"""
+
+    def test_bold_formatting_for_github(self):
+        """Should format text as bold using GitHub markdown syntax"""
+        # Arrange - No mocking needed
+        formatter = MarkdownFormatter(for_slack=False)
+
+        # Act
+        result = formatter.bold("important")
+
+        # Assert
+        assert result == "**important**"
+```
+
+### Infrastructure Layer (97% coverage target)
+
+**Testing approach:**
+- ✅ **Mock external systems** - subprocess, HTTP, file I/O
+- ✅ **Test success and error paths** - What happens on success? On failure?
+- ✅ **Verify system calls** - Check correct commands are executed
+
+**What to mock:** Everything external to Python (subprocess, network, filesystem)
+
+### Service Layer (95% coverage target)
+
+**Testing approach:**
+- ✅ **Mock infrastructure** - Mock git, GitHub API, filesystem
+- ✅ **Test business logic** - Algorithms, data processing, validation
+- ✅ **Test service instantiation** - Verify services are created with correct dependencies
+- ✅ **Test edge cases** - No reviewers available, all tasks complete, etc.
+
+**What to mock:** Infrastructure layer (subprocess, GitHub API, file I/O) and service dependencies
+
+### CLI Integration Tests (98% coverage target)
+
+**Testing approach:**
+- ✅ **Mock service layer** - Mock service classes and their methods
+- ✅ **Mock infrastructure** - Mock git, GitHub API, filesystem operations
+- ✅ **Test command orchestration** - Verify correct sequence of service calls
+- ✅ **Test service instantiation** - Verify services are created with correct dependencies
+- ✅ **Test output** - Verify CLI outputs are formatted correctly
+
+**What to mock:** Service Layer classes and Infrastructure dependencies
+
 ## Key Testing Patterns
 
 ### Pattern: Use Real Domain Models
@@ -346,18 +496,31 @@ def test_workflow_integration():
 
 ## One Concept Per Test
 
-Each test should verify one specific behavior.
+**Each test should verify ONE specific behavior.** If a test has multiple unrelated assertions, split it into separate tests.
+
+**Why?** When a test fails, you should immediately know what broke. Multi-concept tests make debugging harder.
+
+**Exception for E2E Tests:** End-to-end tests are expensive and slow to run (often taking minutes). For E2E tests, it's acceptable and encouraged to verify multiple related aspects of a workflow in a single test to minimize execution time. For example, an E2E test that triggers a workflow can verify:
+- The workflow completes successfully
+- A PR was created
+- The PR has correct labels
+- The PR has an AI summary
+- The PR has cost information
+
+This is a pragmatic trade-off: E2E tests prioritize execution speed over granular isolation, while unit/integration tests maintain strict one-concept-per-test discipline.
+
+### Example
 
 ```python
-# WRONG: Tests multiple things
+# ❌ WRONG: Tests multiple unrelated things
 def test_user_service():
     service = UserService(mock_repo)
     user = service.create_user("Alice")
     assert user.name == "Alice"
     found = service.find_user(user.id)
-    service.delete_user(user.id)  # ❌
+    service.delete_user(user.id)  # Multiple unrelated behaviors
 
-# RIGHT: Separate tests
+# ✅ RIGHT: Separate focused tests
 def test_create_user_sets_name():
     service = UserService(mock_repo)
     user = service.create_user("Alice")
@@ -369,6 +532,47 @@ def test_find_user_returns_existing():
     found = service.find_user("123")
     assert found.id == "123"
 ```
+
+## Coverage Guidelines
+
+### Current Coverage Status
+
+**Target:** 85%+ overall coverage with meaningful tests that provide confidence in refactoring and catch real regressions.
+
+### What to Test
+
+**High Priority (90%+ coverage):**
+- Business logic (task management, data processing algorithms)
+- Command orchestration (CLI commands, workflow coordination)
+- Configuration validation
+- Error handling paths
+
+**Medium Priority (70%+ coverage):**
+- Utilities and formatters
+- API integrations (GitHub, external services)
+- File operations and artifact handling
+
+**Low Priority (may skip):**
+- Simple getters/setters
+- Third-party library wrappers
+- CLI argument parsing (tested via E2E)
+- Entry points (`__main__.py` - tested via E2E)
+
+### Viewing Coverage Reports
+
+```bash
+# Generate HTML coverage report
+pytest tests/ --cov=src --cov-report=html
+
+# Open in browser
+open htmlcov/index.html  # macOS
+xdg-open htmlcov/index.html  # Linux
+
+# View in terminal with missing lines
+pytest tests/ --cov=src --cov-report=term-missing
+```
+
+Coverage reports show which lines are tested and which are not, helping identify gaps in test coverage.
 
 ## Common Anti-Patterns
 
@@ -439,23 +643,129 @@ mock_repo = Mock(spec=UserRepository)
 
 ## Test Organization
 
+Tests should follow consistent organization conventions for maintainability. See the **python-code-style** skill for code organization conventions that also apply to test files.
+
+### Directory Structure
+
+Tests mirror the `src/` directory structure:
+
 ```
 tests/
+├── conftest.py                           # Shared fixtures
 ├── unit/
-│   ├── services/
-│   │   ├── test_entity_service.py
-│   │   └── test_workflow_service.py
-│   └── domain/
-│       └── test_models.py
-├── integration/
-│   └── test_workflows.py
-└── conftest.py  # Shared fixtures
+│   ├── domain/                           # Domain layer tests
+│   │   ├── test_config.py
+│   │   ├── test_models.py
+│   │   └── test_exceptions.py
+│   ├── infrastructure/                   # Infrastructure layer tests
+│   │   ├── git/
+│   │   │   └── test_operations.py
+│   │   ├── github/
+│   │   │   ├── test_operations.py
+│   │   │   └── test_actions.py
+│   │   └── filesystem/
+│   │       └── test_operations.py
+│   └── services/                         # Service layer tests
+│       ├── formatters/
+│       │   └── test_table_formatter.py
+│       ├── test_entity_service.py
+│       ├── test_workflow_service.py
+│       └── test_statistics_service.py
+├── integration/                          # Integration tests
+│   └── cli/                              # CLI command integration tests
+│       └── commands/
+│           ├── test_prepare.py
+│           ├── test_finalize.py
+│           └── test_statistics.py
+├── e2e/                                  # End-to-end tests
+└── builders/                             # Test helpers/factories
 ```
 
-**Naming**:
-- Files: `test_<module_name>.py`
-- Classes: `Test<ClassName>`
-- Functions: `test_<behavior_being_tested>`
+### Naming Conventions
+
+**Class Names**: `TestModuleName` or `TestFunctionName`
+- ✅ `TestEntityService`
+- ✅ `TestCheckUserCapacity`
+- ❌ `ServiceTests` (wrong suffix)
+- ❌ `TestServices` (too vague)
+
+**Test Method Names**: `test_<what>_<when>_<condition>`
+- ✅ `test_find_user_returns_none_when_all_at_capacity`
+- ✅ `test_create_branch_raises_error_when_branch_exists`
+- ✅ `test_parse_data_extracts_id_and_name`
+- ❌ `test_user` (not descriptive)
+- ❌ `test_find_user_works` (vague)
+
+**Fixture Names**: `<resource>_<state>` or `mock_<service>`
+- ✅ `user_config`, `sample_spec_file`, `mock_github_api`
+- ❌ `data`, `setup`, `fixture1`
+
+**File Names**: `test_<module_name>.py`
+- ✅ `test_entity_service.py`
+- ✅ `test_operations.py`
+- ❌ `entity_tests.py`
+
+## CI/CD Integration
+
+### Automated Testing
+
+Tests run automatically on:
+- Every push to main branch
+- Every pull request
+- Via GitHub Actions workflow
+
+### Test Workflow Example
+
+```yaml
+# .github/workflows/test.yml
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+      - name: Run tests with coverage
+        run: |
+          pytest tests/unit/ tests/integration/ \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-report=html \
+            --cov-fail-under=70
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: htmlcov/
+```
+
+### PR Requirements
+
+- All tests must pass
+- Coverage must meet minimum threshold (typically 70%)
+- New features require tests
+- Bug fixes should include regression tests
+
+## Related Skills
+
+- **creating-services**: For understanding service constructor patterns that you'll be testing
+- **domain-modeling**: For understanding domain models and why not to mock them
+- **python-code-style**: For code organization conventions that apply to test files
+- **identifying-layer-placement**: For understanding which layer your code belongs to and how to test it
 
 ## Further Reading
 
