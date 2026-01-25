@@ -53,7 +53,17 @@ argument-hint: "[model-name]"
 
 **Expected outcome:** Comprehensive skill teaching developers to create rich domain models that encapsulate parsing logic and provide type-safe interfaces.
 
-- [ ] Phase 2: Create cli-architecture skill
+- [x] Phase 2: Create cli-architecture skill ✓ **COMPLETED**
+
+**Technical notes:**
+- Created `plugin/skills/cli-architecture/SKILL.md` with comprehensive CLI architecture guidance
+- Extracted and synthesized content from `command-dispatcher.md` (full file) and CLI patterns from `python-style.md`
+- Included YAML frontmatter with user-invocable: true and argument-hint: "[command-name]"
+- Added comprehensive sections: When to Use, Quick Reference, Architecture Pattern, Command Structure, Module Organization, CLI Command Pattern (Explicit Parameters), Service Instantiation Pattern, Class-Based Services, Design Principles, Related Patterns, Related Skills, Further Reading
+- All code examples include ✅/❌ markers consistent with existing skills
+- Covered: single dispatcher pattern, command routing, layered directory structure, explicit parameter flow (anti-pattern: commands reading env vars), three-section service instantiation pattern, static vs instance methods
+- Added cross-references to creating-services, dependency-injection, identifying-layer-placement, and domain-modeling skills
+- File structure verified: 5 total skills now available (3 existing + 2 new)
 
 Create `plugin/skills/cli-architecture/SKILL.md` extracting content from command-dispatcher.md and python-style.md CLI sections:
 
