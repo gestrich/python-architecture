@@ -7,10 +7,7 @@
     "url": "https://github.com/gestrich"
   },
   "homepage": "https://github.com/gestrich/service-layer-skills",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gestrich/service-layer-skills.git"
-  },
+  "repository": "https://github.com/gestrich/service-layer-skills.git",
   "license": "MIT",
   "keywords": ["python", "service-layer", "testing", "architecture", "dependency-injection"]
 }
