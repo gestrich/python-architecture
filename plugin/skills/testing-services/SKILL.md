@@ -1,8 +1,11 @@
-# Testing Services Skill
+---
+name: testing-services
+description: Writes unit tests for Python service classes using Arrange-Act-Assert pattern with proper mocking at boundaries. Tests behavior, not implementation. Mocks external systems only (API calls, file I/O, databases). Use when writing tests for services or fixing test coverage.
+user-invocable: true
+argument-hint: "[service-class-name]"
+---
 
-**Name**: `testing-services`
-
-**Description**: Writes unit tests for Python service classes using Arrange-Act-Assert pattern with proper mocking at boundaries. Tests behavior, not implementation. Mocks external systems only (API calls, file I/O, databases). Use when writing tests for services or fixing test coverage.
+# Testing Services
 
 ## When to Use This Skill
 

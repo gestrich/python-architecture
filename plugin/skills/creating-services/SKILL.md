@@ -1,8 +1,11 @@
-# Creating Services Skill
+---
+name: creating-services
+description: Creates new Python service classes following Martin Fowler's Service Layer pattern with constructor-based dependency injection, proper layering (Core vs Composite), and static vs instance method conventions. Use when adding new services or refactoring business logic into service classes.
+user-invocable: true
+argument-hint: "[service-name] [core|composite]"
+---
 
-**Name**: `creating-services`
-
-**Description**: Creates new Python service classes following Martin Fowler's Service Layer pattern with constructor-based dependency injection, proper layering (Core vs Composite), and static vs instance method conventions. Use when adding new services or refactoring business logic into service classes.
+# Creating Services
 
 ## When to Use This Skill
 

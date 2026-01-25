@@ -1,8 +1,11 @@
-# Identifying Layer Placement
+---
+name: identifying-layer-placement
+description: Determines the correct architectural layer (Entry Point/Service/Domain/Infrastructure) for code placement in Python applications using Service Layer pattern. Prevents layer violations and maintains separation of concerns. Use when adding new functionality, refactoring code, or unclear where code should live.
+user-invocable: true
+argument-hint: "[code-description]"
+---
 
-## Skill Metadata
-- **Name**: identifying-layer-placement
-- **Description**: Determines the correct architectural layer (Entry Point/Service/Domain/Infrastructure) for code placement in Python applications using Service Layer pattern. Prevents layer violations and maintains separation of concerns. Use when adding new functionality, refactoring code, or unclear where code should live.
+# Identifying Layer Placement
 
 ## Quick Decision Tree
 
