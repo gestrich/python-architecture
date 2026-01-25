@@ -142,7 +142,17 @@ argument-hint: ""
 
 **Expected outcome:** Developers understand how to design services with explicit, testable dependencies and configuration that flows from the top down.
 
-- [ ] Phase 4: Create python-code-style skill
+- [x] Phase 4: Create python-code-style skill ✓ **COMPLETED**
+
+**Technical notes:**
+- Created `plugin/skills/python-code-style/SKILL.md` with comprehensive Python code style guidance
+- Extracted and synthesized content from `python-style.md` (lines 1-94 for method organization, 1183-1393 for datetime handling, 1395-1431 for circular imports, 1432-1477 for type annotations)
+- Included YAML frontmatter with user-invocable: true and argument-hint: "[topic]"
+- Added comprehensive sections: When to Use, Quick Reference, Method Organization Principles (Public Before Private, Standard Method Order), Section Headers for Complex Services, Module-Level Code Organization, Timezone-Aware Datetimes, Circular Import Avoidance, Modern Type Annotations
+- All code examples include ✅/❌ markers consistent with existing skills
+- Covered: public before private, high-level before low-level, standard method order (special → class → static → instance → private), section headers, module organization, timezone-aware datetimes with UTC, parse_iso_timestamp helper, domain model validation, circular import fixes, Self type for factory methods, from __future__ import annotations
+- Added cross-references to creating-services, testing-services, domain-modeling skills
+- File structure verified: 7 total skills now available (3 existing + 4 new)
 
 Create `plugin/skills/python-code-style/SKILL.md` extracting Python style guidance from python-style.md:
 
