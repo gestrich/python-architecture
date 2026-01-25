@@ -263,7 +263,22 @@ Update `plugin/skills/testing-services/SKILL.md` by adding content from testing-
 
 **Expected outcome:** Enhanced testing skill with comprehensive coverage of test architecture, layer-based strategies, and practical coverage guidance.
 
-- [ ] Phase 6: Add cross-references between skills
+- [x] Phase 6: Add cross-references between skills ✓ **COMPLETED**
+
+**Technical notes:**
+- Added cross-references to creating-services skill in Constructor Pattern, Service Templates, and Service Instantiation sections
+- Added cross-references to identifying-layer-placement skill in Entry Point Layer, Service Layer, and Domain Layer sections
+- Verified all 7 skills now have Related Skills sections with bidirectional references
+- Cross-references are accurate and consistent:
+  - creating-services ↔ dependency-injection, domain-modeling, cli-architecture, python-code-style, testing-services, identifying-layer-placement
+  - identifying-layer-placement ↔ creating-services, domain-modeling, cli-architecture, dependency-injection, testing-services, python-code-style
+  - testing-services ↔ creating-services, domain-modeling, python-code-style, identifying-layer-placement (from Phase 5)
+  - domain-modeling ↔ creating-services, testing-services, identifying-layer-placement
+  - cli-architecture ↔ creating-services, dependency-injection, identifying-layer-placement, domain-modeling
+  - dependency-injection ↔ creating-services, cli-architecture, testing-services, identifying-layer-placement
+  - python-code-style ↔ creating-services, testing-services, domain-modeling, dependency-injection
+- All cross-references use skill names that match the actual skill directories
+- File structure verified: All 7 skills have comprehensive cross-references enabling skill discovery
 
 Update existing skills to reference new skills:
 

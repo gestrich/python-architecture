@@ -37,6 +37,8 @@ class ServiceName:
 - NO reading environment variables or config files inside services
 - Dependencies are either other services or infrastructure components
 
+**Note**: For detailed patterns on dependency injection, see the **dependency-injection** skill.
+
 ### Method Organization
 
 Order methods: Constructor → Public → Static → Private (high-level before low-level)
@@ -84,6 +86,8 @@ class ServiceName:
 4. Does it delegate all infrastructure work to other services? → Likely Composite
 
 ## Service Templates
+
+**Note**: Services often work with domain models. For guidance on creating the models used by services, see the **domain-modeling** skill.
 
 ### Core Service Template
 
@@ -268,6 +272,8 @@ class UserService:
 
 Services are instantiated at entry points (CLI commands, API handlers) using constructor injection.
 
+**Note**: For detailed command-level service instantiation patterns in CLI applications, see the **cli-architecture** skill.
+
 ### In CLI Commands
 
 ```python
@@ -444,6 +450,15 @@ class EmailService:
 class PaymentService:
     def process_payment(self): ...
 ```
+
+## Related Skills
+
+- **dependency-injection**: Detailed patterns for constructor-based dependency injection and configuration flow
+- **domain-modeling**: Creating rich domain models that services use and orchestrate
+- **cli-architecture**: Command-level service instantiation and CLI structure patterns
+- **python-code-style**: Method organization conventions for service classes
+- **testing-services**: Testing services with mocked dependencies
+- **identifying-layer-placement**: Understanding where services fit in the overall architecture
 
 ## Further Reading
 

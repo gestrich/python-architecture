@@ -67,6 +67,8 @@ Domain: No dependencies (pure)
 
 **File locations**: `cli/`, `api/`, `scripts/`, `main.py`, `__main__.py`
 
+**Note**: For detailed command dispatcher patterns and CLI architecture, see the **cli-architecture** skill.
+
 **Example**:
 ```python
 def cmd_prepare(args, gh):
@@ -97,6 +99,8 @@ def cmd_prepare(args, gh):
 - Transaction boundaries and business rule enforcement
 
 **File locations**: `services/`, `business/`
+
+**Note**: For service constructor patterns and dependency management, see the **dependency-injection** skill.
 
 **Example - Core service**:
 ```python
@@ -135,6 +139,8 @@ class StatisticsService:
 - Value objects, enums, domain exceptions
 
 **File locations**: `models/`, `domain/`, `entities/`, `config/`
+
+**Note**: For comprehensive domain modeling guidance and the parse-once principle, see the **domain-modeling** skill.
 
 **Example**:
 ```python
@@ -445,6 +451,15 @@ class GitService:
 4. **Does it coordinate business operations?** → Service
 
 Default to Service layer if uncertain, refactor later if needed.
+
+## Related Skills
+
+- **creating-services**: Learn how to implement services following the Service Layer pattern
+- **domain-modeling**: Understand how to create rich domain models with parsing logic
+- **cli-architecture**: Detailed patterns for structuring CLI entry points and commands
+- **dependency-injection**: Service constructor patterns and configuration flow
+- **testing-services**: Layer-based testing strategies and what to mock at each layer
+- **python-code-style**: Code organization conventions for each layer
 
 ## Further Reading
 
