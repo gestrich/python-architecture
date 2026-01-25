@@ -4,11 +4,15 @@ A Claude Code plugin providing architectural best practices for Python applicati
 
 ## Overview
 
-This plugin provides three complementary skills that guide Claude when working with Python projects using the Service Layer pattern:
+This plugin provides seven specialized skills that guide Claude when working with Python projects using the Service Layer pattern. These skills cover service creation, testing, architectural layer placement, domain modeling, CLI structure, dependency injection, and code style conventions.
 
 - **creating-services** - Guides Claude in creating well-designed service classes with proper dependency injection and layering
 - **testing-services** - Helps Claude write effective tests following the Arrange-Act-Assert pattern with proper mocking at boundaries
 - **identifying-layer-placement** - Assists Claude in determining the correct architectural layer for new code
+- **domain-modeling** - Design rich domain models with parse-once principle, factory methods, and type-safe APIs following Repository pattern
+- **cli-architecture** - Structure CLI applications using command dispatcher pattern with proper service instantiation and explicit parameter flow
+- **dependency-injection** - Apply constructor-based dependency injection with fail-fast principles and configuration flowing from entry points
+- **python-code-style** - Follow Python code organization conventions including method ordering, timezone-aware datetimes, and type annotations
 
 These skills work together to ensure your codebase maintains clean architecture, testability, and separation of concerns.
 
@@ -84,6 +88,74 @@ claude --plugin-dir ~/path/to/python-architecture
 - "Which layer should handle database queries?"
 - "I need to add validation logic - where does it go?"
 
+### 4. domain-modeling
+
+**When activated:** Claude automatically uses this skill when you're creating domain models, parsing data structures, or designing data classes.
+
+**What it provides:**
+- Parse-once principle with type-safe APIs
+- Factory method patterns for creating domain models
+- Repository pattern for data access
+- Type-safe domain model design
+- Validation at model boundaries
+
+**Example triggers:**
+- "Create a User model that parses from YAML"
+- "I need to parse this JSON into domain objects"
+- "Design a domain model for project configuration"
+- "Add validation to this data class"
+
+### 5. cli-architecture
+
+**When activated:** Claude automatically uses this skill when you're building CLI tools or structuring command-line applications.
+
+**What it provides:**
+- Command dispatcher pattern with single entry point
+- Service instantiation in CLI commands
+- Explicit parameter flow (commands don't read env vars)
+- Layered directory structure for CLI apps
+- Three-section service instantiation pattern
+
+**Example triggers:**
+- "Build a multi-command CLI tool"
+- "Structure my CLI application"
+- "Add a new command to the dispatcher"
+- "How should commands instantiate services?"
+
+### 6. dependency-injection
+
+**When activated:** Claude automatically uses this skill when you're designing service constructors, managing dependencies, or dealing with configuration.
+
+**What it provides:**
+- Constructor-based dependency injection
+- Required vs optional dependency patterns
+- Fail-fast exception handling
+- Configuration flow from entry points
+- Avoiding services that read environment variables
+
+**Example triggers:**
+- "My service constructor has too many optional parameters"
+- "Services are reading environment variables directly"
+- "How should I handle missing dependencies?"
+- "Where should configuration defaults go?"
+
+### 7. python-code-style
+
+**When activated:** Claude automatically uses this skill when you're organizing code, handling dates and times, or dealing with circular imports.
+
+**What it provides:**
+- Method organization (public before private, standard ordering)
+- Section headers for complex services
+- Timezone-aware datetime handling with UTC
+- Circular import avoidance strategies
+- Modern type annotations (Self, from __future__ import annotations)
+
+**Example triggers:**
+- "Organize the methods in this service class"
+- "Tests failing due to naive datetimes"
+- "How do I fix this circular import?"
+- "Add type hints to this factory method"
+
 ## Usage
 
 These skills are **automatically invoked** by Claude based on the context of your requests. You don't need to explicitly call them - Claude will recognize when architectural guidance is needed and apply the relevant skill.
@@ -105,11 +177,15 @@ The skills are framework-agnostic and work with any Python application using ser
 
 This plugin is especially helpful when:
 
-- **Starting a new project** - Establish good architectural patterns from the beginning
-- **Refactoring legacy code** - Migrate toward cleaner layered architecture
-- **Onboarding new developers** - Ensure consistent patterns across the team
-- **Code reviews** - Claude can apply these patterns when suggesting improvements
-- **Adding features** - Maintain architectural consistency as the codebase grows
+- **Starting a new project** - Establish good architectural patterns from the beginning with proper service design, domain modeling, and CLI structure
+- **Refactoring legacy code** - Migrate toward cleaner layered architecture with explicit dependency injection and proper layer separation
+- **Onboarding new developers** - Ensure consistent patterns across the team for code organization, testing, and architectural decisions
+- **Code reviews** - Claude can apply these patterns when suggesting improvements to service constructors, domain models, or test structure
+- **Adding features** - Maintain architectural consistency as the codebase grows by following established patterns for each layer
+- **Building CLI tools** - Structure command-line applications with proper dispatcher patterns and service instantiation
+- **Parsing external data** - Create robust domain models with type-safe parsing and validation at boundaries
+- **Fixing datetime bugs** - Apply timezone-aware datetime handling to prevent naive datetime issues
+- **Resolving circular imports** - Restructure module dependencies following one-way dependency graphs
 
 ## Further Reading
 

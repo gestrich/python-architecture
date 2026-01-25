@@ -307,7 +307,16 @@ Each new skill gets a Related Skills section at the end (before Further Reading)
 
 **Expected outcome:** Interconnected skill network where users can easily discover related guidance.
 
-- [ ] Phase 7: Update README.md
+- [x] Phase 7: Update README.md ✓ **COMPLETED**
+
+**Technical notes:**
+- Updated Overview section to reflect 7 specialized skills with brief descriptions
+- Added detailed sections for all 4 new skills (domain-modeling, cli-architecture, dependency-injection, python-code-style)
+- Each new skill section includes: When activated, What it provides, Example triggers
+- Enhanced Use Cases section with specific scenarios for new skills (building CLI tools, parsing external data, fixing datetime bugs, resolving circular imports)
+- Maintained consistent formatting with existing skill sections
+- README now accurately documents all 7 skills with clear activation triggers and usage guidance
+- Installation instructions unchanged (skills are auto-discovered)
 
 Update README.md to document all 7 skills:
 
