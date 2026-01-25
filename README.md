@@ -27,8 +27,9 @@ These skills work together to ensure your codebase maintains clean architecture,
 
 2. Install the plugin:
    ```
-   /plugin install python-architecture@gestrich-python-architecture
+   claude plugin install python-architecture@gestrich-python-architecture --scope project
    ```
+   > **Note:** Use `--scope user` instead of `--scope project` to install system-wide for all projects.
 
 3. Restart Claude Code if necessary
 
