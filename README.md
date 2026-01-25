@@ -165,6 +165,37 @@ The skills work best when:
 - Your project follows (or aims to follow) the Service Layer pattern
 - You're asking for guidance on design decisions, not just quick fixes
 
+## Troubleshooting
+
+### Slash commands not showing in terminal
+
+The slash commands (e.g., `/creating-services`) may not appear in the terminal autocomplete but will show up in the Claude Code VSCode extension. Use the VSCode extension for the best experience with slash command discovery.
+
+### Updating the plugin
+
+If you need to update the plugin to a newer version, you may need to remove and re-add it:
+
+```
+/plugin uninstall python-architecture@gestrich-python-architecture
+/plugin install python-architecture@gestrich-python-architecture
+```
+
+### Plugin not available after adding marketplace
+
+Sometimes the plugin won't appear as an installation option even after adding the marketplace. You can work around this by manually enabling the plugin in your Claude Code configuration.
+
+Create or edit `~/.claude/config.json` and add:
+
+```json
+{
+  "enabledPlugins": {
+    "python-architecture@gestrich-python-architecture": true
+  }
+}
+```
+
+Then restart Claude Code.
+
 ## Requirements
 
 - Python project (any version)
