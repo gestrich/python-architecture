@@ -92,7 +92,17 @@ argument-hint: "[command-name]"
 
 **Expected outcome:** Clear guidance on structuring CLI applications with proper separation between orchestration (commands) and business logic (services).
 
-- [ ] Phase 3: Create dependency-injection skill
+- [x] Phase 3: Create dependency-injection skill ✓ **COMPLETED**
+
+**Technical notes:**
+- Created `plugin/skills/dependency-injection/SKILL.md` with comprehensive DI guidance
+- Extracted and synthesized content from `python-style.md` (lines 95-723)
+- Included YAML frontmatter with user-invocable: true and argument-hint: ""
+- Added comprehensive sections: When to Use, Quick Reference, Principle sections for avoiding optional dependencies, fail-fast patterns, configuration flow, and environment variables
+- All code examples include ✅/❌ markers consistent with existing skills
+- Covered: required vs optional dependencies, fail-fast exception handling, custom exception classes, configuration flowing from entry points, services not reading environment variables, constructor vs method parameters
+- Added cross-references to creating-services, cli-architecture, testing-services, and identifying-layer-placement skills
+- File structure verified: 6 total skills now available (3 existing + 3 new)
 
 Create `plugin/skills/dependency-injection/SKILL.md` extracting DI patterns from python-style.md (lines 95-723):
 
