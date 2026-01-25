@@ -1,15 +1,17 @@
 {
-  "version": "1.0.0",
   "name": "gestrich-service-layer-skills",
+  "version": "1.0.0",
+  "description": "Claude Code skills for Python Service Layer pattern development",
   "owner": {
-    "name": "Bill Gestrich",
-    "url": "https://github.com/gestrich"
+    "name": "Bill Gestrich"
   },
   "plugins": [
     {
       "name": "service-layer-skills",
-      "source": ".",
-      "description": "General-purpose skills for Python applications following Martin Fowler's Service Layer pattern. Includes guides for creating services, writing tests, and determining correct architectural layers."
+      "source": "./plugin",
+      "description": "General-purpose skills for Python applications following Martin Fowler's Service Layer pattern. Includes guides for creating services, writing tests, and determining correct architectural layers.",
+      "version": "1.0.0",
+      "category": "development"
     }
   ]
 }
