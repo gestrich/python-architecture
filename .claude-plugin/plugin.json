@@ -1,0 +1,16 @@
+{
+  "name": "service-layer-skills",
+  "description": "General-purpose skills for Python applications following Martin Fowler's Service Layer pattern. Includes guides for creating services, writing tests, and determining correct architectural layers.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Bill",
+    "url": "https://github.com/gestrich"
+  },
+  "homepage": "https://github.com/gestrich/service-layer-skills",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gestrich/service-layer-skills.git"
+  },
+  "license": "MIT",
+  "keywords": ["python", "service-layer", "testing", "architecture", "dependency-injection"]
+}
