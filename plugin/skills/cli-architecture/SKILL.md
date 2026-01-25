@@ -1,6 +1,6 @@
 ---
 name: cli-architecture
-description: Structure CLI applications using command dispatcher pattern with layered architecture. Covers entry points, command routing, service instantiation, and explicit parameter flow. Use when building CLI tools or refactoring command structure.
+description: Structure CLI applications using command dispatcher pattern. Covers entry points, command routing, argument parsing, and explicit parameter flow. Use when building CLI tools or refactoring command structure.
 user-invocable: true
 argument-hint: "[command-name]"
 ---
@@ -12,10 +12,9 @@ argument-hint: "[command-name]"
 Activate this skill when:
 - Building a multi-command CLI tool
 - Structuring command entry points and routing
-- Organizing CLI code with proper separation of concerns
-- Implementing service instantiation patterns in commands
-- Ensuring explicit parameter passing (not environment variables)
-- Setting up a command dispatcher pattern
+- Setting up argument parsing and command dispatching
+- Ensuring explicit parameter passing to commands
+- Organizing CLI command handlers
 
 ## Quick Reference
 
@@ -46,13 +45,11 @@ def cmd_statistics(
     repo: str,
     days_back: int = 30
 ) -> int:
-    """Orchestrate statistics workflow - returns exit code"""
-    # 1. Get dependencies
-    # 2. Initialize infrastructure
-    # 3. Initialize services
-    # 4. Use services
-    # 5. Format output
-    # 6. Return exit code
+    """Execute statistics command - returns exit code"""
+    # Command orchestrates the workflow
+    # Calls business logic functions/services
+    # Formats and writes output
+    # Returns exit code
     return 0
 ```
 
@@ -121,7 +118,7 @@ def cmd_statistics(
     config_path: Optional[str] = None,
     days_back: int = 30
 ) -> int:
-    """Orchestrate statistics workflow.
+    """Execute statistics command.
 
     Args:
         gh: GitHub Actions helper instance
@@ -133,25 +130,17 @@ def cmd_statistics(
         Exit code (0 for success, 1 for failure)
     """
     try:
-        # 1. Get common dependencies
-        metadata_store = GitHubMetadataStore(repo)
+        # 1. Initialize dependencies (services, helpers, etc.)
+        stats_service = create_statistics_service(repo)
 
-        # 2. Initialize infrastructure layer
-        metadata_service = MetadataService(metadata_store)
+        # 2. Execute business logic
+        stats = stats_service.collect_statistics(days_back)
 
-        # 3. Initialize service layer
-        project_service = ProjectService(repo)
-        stats_service = StatisticsService(repo, metadata_service)
-
-        # 4. Use services to execute business logic
-        projects = project_service.discover_projects()
-        stats = stats_service.collect_statistics(projects, days_back)
-
-        # 5. Format output
+        # 3. Format and write output
         output = format_statistics_table(stats)
         gh.set_output("statistics", output)
 
-        # 6. Return exit code
+        # 4. Return exit code
         return 0
 
     except Exception as e:
@@ -160,83 +149,55 @@ def cmd_statistics(
 ```
 
 **Command responsibilities:**
-- Orchestrate workflow steps
-- Handle argument parsing (via dispatcher)
-- Initialize infrastructure and services
-- Call business logic functions
-- Write outputs (GitHub Actions, files, stdout)
-- Return exit codes
+- Accept explicit parameters (not environment variables)
+- Initialize dependencies needed for the command
+- Execute business logic
+- Handle errors and exceptions
+- Write outputs (stdout, files, logs)
+- Return exit codes (0 for success, non-zero for failure)
 
 ## Module Organization
 
-### Layered Directory Structure
+### CLI Directory Structure
 
 ```
 src/mypackage/
 ├── __init__.py
 ├── __main__.py              # Entry point - command dispatcher
-
-├── domain/                  # Layer 1: Core business logic
-│   ├── models.py            # Data models (dataclasses)
-│   ├── exceptions.py        # Custom exceptions
-│   └── config.py            # Configuration models
-
-├── infrastructure/          # Layer 2: External dependencies
-│   ├── git/
-│   │   └── operations.py    # Git command wrappers
-│   ├── github/
-│   │   ├── operations.py    # GitHub CLI wrappers
-│   │   └── actions.py       # GitHub Actions integration
-│   └── filesystem/
-│       └── operations.py    # File I/O operations
-
-├── services/                # Layer 3: Business logic services
-│   ├── __init__.py
-│   ├── core/
-│   │   ├── pr_service.py
-│   │   ├── project_service.py
-│   │   └── task_service.py
-│   ├── composite/           # Higher-level orchestration
-│   │   └── statistics_service.py
-│   └── formatters/          # Service utilities
-│       └── table_formatter.py
-
-└── cli/                     # Layer 4: Presentation layer
-    ├── commands/
-    │   ├── prepare.py
-    │   ├── finalize.py
-    │   └── statistics.py
-    └── parser.py            # Argument parser configuration
+│
+└── cli/                     # CLI layer
+    ├── __init__.py
+    ├── commands/            # Command implementations
+    │   ├── __init__.py
+    │   ├── prepare.py       # cmd_prepare()
+    │   ├── finalize.py      # cmd_finalize()
+    │   └── statistics.py    # cmd_statistics()
+    │
+    └── parser.py            # Argument parser configuration (optional)
 ```
 
 ### Module Responsibilities
 
-**Commands** (`cli/commands/`):
-- Orchestrate workflow steps
-- Initialize infrastructure and services
-- Handle command-line arguments
-- Read environment variables (adapter layer only)
-- Write outputs and return exit codes
-- **NO business logic**
+**`__main__.py`** (Entry point):
+- Parse command-line arguments
+- Route to command implementations
+- Translate environment variables to parameters (adapter layer)
+- Call command functions with explicit parameters
 
-**Domain Models** (`domain/`):
-- Data structures (dataclasses, simple classes)
-- Formatting methods (Slack, JSON, markdown)
-- Properties and computed values
-- **NO external dependencies** (no GitHub API, no file I/O)
+**`cli/commands/`** (Command implementations):
+- Accept explicit parameters (typed function arguments)
+- Initialize dependencies needed for execution
+- Orchestrate workflow by calling business logic
+- Handle errors and exceptions
+- Write outputs (stdout, files, logs)
+- Return exit codes
+- **NO environment variable reading** (only in `__main__.py`)
+- **NO business logic** (delegate to services/functions)
 
-**Services** (`services/`):
-- Orchestrate business logic across infrastructure
-- Gather and aggregate data from external sources
-- Implement use cases required by CLI commands
-- Process and transform data using domain models
-- Return model instances
-
-**Infrastructure** (`infrastructure/`):
-- Low-level wrappers around external tools
-- Git commands, GitHub CLI, filesystem operations
-- Error handling for subprocess calls
-- External API integrations
+**`cli/parser.py`** (Optional):
+- Define argument parsers for each command
+- Configure subparsers and arguments
+- Separate parser configuration from routing logic
 
 ## CLI Command Pattern: Explicit Parameters
 
@@ -247,7 +208,7 @@ CLI command functions should receive **explicit parameters** and never read envi
 ### Architecture Layers
 
 ```
-GitHub Actions (env vars) → __main__.py (adapter) → commands (params) → services (params)
+Environment/Args → __main__.py (adapter) → commands (params) → business logic
 ```
 
 **Only `__main__.py` reads environment variables in the CLI layer.**
@@ -317,153 +278,58 @@ elif args.command == "statistics":
 - ✅ **Explicit dependencies**: Function signature shows exactly what's needed
 - ✅ **Type safety**: IDEs can autocomplete and type-check
 - ✅ **Easy testing**: Just pass parameters, no environment mocking
-- ✅ **Works everywhere**: Both GitHub Actions and local development
+- ✅ **Works everywhere**: CI environments, scripts, and local development
 - ✅ **Discoverable**: `--help` shows all options
 
-## Service Instantiation Pattern
-
-### Three-Section Pattern
-
-All CLI commands follow this pattern for service instantiation:
-
-```python
-def cmd_prepare(
-    gh: GitHubActionsHelper,
-    repo: str,
-    pr_number: int
-) -> int:
-    # ============================================================
-    # 1. Get Common Dependencies
-    # ============================================================
-    # Extract configuration and shared values
-
-    # ============================================================
-    # 2. Initialize Infrastructure Layer
-    # ============================================================
-    metadata_store = GitHubMetadataStore(repo)
-    metadata_service = MetadataService(metadata_store)
-
-    # ============================================================
-    # 3. Initialize Service Layer
-    # ============================================================
-    project_service = ProjectService(repo)
-    task_service = TaskService(repo, metadata_service)
-    reviewer_service = ReviewerService(repo, metadata_service)
-    pr_service = PRService(repo)
-
-    # ============================================================
-    # 4. Use Services Throughout Command
-    # ============================================================
-    project = project_service.detect_project_from_pr(pr_number)
-    task = task_service.find_next_available_task(spec_content)
-    reviewer = reviewer_service.find_available_reviewer(reviewers, label, project)
-    branch = pr_service.format_branch_name(project, task_index)
-
-    # ... rest of command logic
-    return 0
-```
-
-**Benefits of this pattern:**
-- ✅ **Eliminates redundancy**: Services instantiated once, not per method call
-- ✅ **Explicit dependencies**: All service dependencies visible upfront
-- ✅ **Testable**: Easy to mock services for testing
-- ✅ **Consistent structure**: All commands follow same pattern
-- ✅ **Easy extension**: Adding new services is straightforward
-
-## Class-Based Services
-
-### Convention: Services Are Classes with Dependency Injection
-
-Services are classes where:
-- **Dependencies injected** via constructor
-- **Services encapsulate** business logic for specific domain
-- **Services instantiated once** per CLI command execution
-- **Services share state** through instance variables
-
-```python
-class ProjectService:
-    """Service for handling project operations"""
-
-    def __init__(self, repo: str):
-        """Initialize service with required dependencies"""
-        self.repo = repo
-
-    def detect_project_from_pr(self, pr_number: int) -> Project:
-        """Instance method uses self.repo"""
-        labels = get_pr_labels(self.repo, pr_number)
-        return self._parse_project_from_labels(labels)
-
-    @staticmethod
-    def parse_branch_name(branch: str) -> tuple[str, int]:
-        """Static method for pure functions with no state dependency"""
-        match = re.match(r"^([^/]+)/task-(\d+)", branch)
-        return match.groups() if match else (None, None)
-```
-
-### Static vs Instance Methods
-
-**Use instance methods when:**
-- Method needs access to injected dependencies (`self.repo`, `self.metadata_service`)
-- Method performs I/O or makes API calls
-- Method needs to share state with other methods
-
-**Use static methods when:**
-- Method is a pure function with no state dependency
-- Method performs pure computation or string manipulation
-- Method can be called without instantiating the service
 
 ## Design Principles
 
-### Separation of Concerns
+### Single Entry Point
 
-Each layer has a single, clear responsibility:
+Use `__main__.py` as the single entry point that routes to all commands:
+- ✅ Easier to understand and debug
+- ✅ Consistent interface across all commands
+- ✅ Simpler to test (just call command functions)
+- ✅ Works in any environment (local, CI, production)
 
-1. **CLI Layer**: Argument parsing, environment variables, command routing
-2. **Service Layer**: Business logic orchestration
-3. **Infrastructure Layer**: External system integration
-4. **Domain Layer**: Core business entities and rules
+### Explicit Parameters
 
-### Dependency Direction
+Commands receive explicit typed parameters, not environment variables:
+- ✅ Clear function signatures show what's needed
+- ✅ IDE autocomplete and type checking
+- ✅ Easy to test without mocking environment
+- ✅ Self-documenting code
 
-Higher layers depend on lower layers, never the reverse:
+### Thin Command Layer
 
-```
-CLI → Services → Infrastructure → Domain
-```
-
-Commands depend on services, services depend on infrastructure, but infrastructure never depends on services.
-
-### Testability
-
-- **Domain models**: Test independently with no mocks
-- **Infrastructure**: Mock external systems (GitHub API, filesystem)
-- **Services**: Mock infrastructure dependencies
-- **Commands**: Mock services for unit tests, use real services for integration tests
+Commands orchestrate but don't implement business logic:
+- ✅ Commands call services/functions for actual work
+- ✅ Easy to test business logic independently
+- ✅ Commands focus on CLI concerns (args, output, exit codes)
+- ✅ Business logic reusable outside CLI context
 
 ### Error Handling
 
-Each layer handles errors appropriately:
-- **Commands**: Catch exceptions, log errors, return exit codes
-- **Services**: Raise domain exceptions with clear messages
-- **Infrastructure**: Raise infrastructure exceptions for external failures
-- **Domain**: Validate data in constructors/factories
-
-## Related Patterns
-
-- **Command Pattern**: Encapsulates requests as objects
-- **Dependency Injection**: Constructor-based dependency management
-- **Service Layer Pattern**: Business logic orchestration
-- **Repository Pattern**: Data access abstraction
+Commands are responsible for error handling:
+- Catch exceptions from business logic
+- Log errors with appropriate detail
+- Return meaningful exit codes
+- Provide user-friendly error messages
 
 ## Related Skills
 
-- **creating-services**: Detailed guidance on implementing service classes
-- **dependency-injection**: Constructor patterns and configuration flow
-- **identifying-layer-placement**: Understanding which layer code belongs in
-- **domain-modeling**: Creating rich domain models used by services
+- **creating-services**: How to implement services called by CLI commands
+- **dependency-injection**: How commands receive and use dependencies
+- **testing-services**: Testing strategies for CLI commands and business logic
+
+## Related Patterns
+
+- **Command Pattern**: Encapsulates requests as objects with execute methods
+- **Adapter Pattern**: `__main__.py` adapts environment variables to parameters
+- **Template Method**: Commands follow consistent structure (init, execute, output, return)
 
 ## Further Reading
 
-- [Martin Fowler - Service Layer](https://martinfowler.com/eaaCatalog/serviceLayer.html)
-- [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [Click - Python CLI Framework](https://click.palletsprojects.com/)
+- [argparse - Command-line parsing](https://docs.python.org/3/library/argparse.html)
 - [Python Application Layouts](https://realpython.com/python-application-layouts/)
