@@ -181,6 +181,15 @@ If you need to update the plugin to a newer version, you may need to remove and 
 /plugin install python-architecture@gestrich-python-architecture
 ```
 
+### Slash commands not accessible after installation
+
+If slash commands aren't working after installing the plugin, try uninstalling and reinstalling with explicit scope:
+
+```
+/plugin uninstall python-architecture@gestrich-python-architecture
+/plugin install python-architecture@gestrich-python-architecture --scope project
+```
+
 ### Plugin not available after adding marketplace
 
 Sometimes the plugin won't appear as an installation option even after adding the marketplace. You can work around this by manually enabling the plugin in your Claude Code configuration.
